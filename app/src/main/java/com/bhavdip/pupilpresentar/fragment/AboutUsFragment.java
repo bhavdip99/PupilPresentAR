@@ -9,11 +9,11 @@ import android.view.ViewGroup;
 import com.bhavdip.pupilpresentar.R;
 
 
-public class CameraFragment extends Fragment {
+public class AboutUsFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_camera, container, false);
+        View view = inflater.inflate(R.layout.fragment_aboutus, container, false);
 
 
         return view;

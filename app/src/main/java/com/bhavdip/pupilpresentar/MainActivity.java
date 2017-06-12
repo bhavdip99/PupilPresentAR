@@ -1,11 +1,15 @@
 package com.bhavdip.pupilpresentar;
 
+import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.location.Location;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.os.ResultReceiver;
@@ -24,7 +28,7 @@ import android.widget.Toast;
 import com.bhavdip.pupilpresentar.barcodescanning.BarcodeCaptureActivity;
 import com.bhavdip.pupilpresentar.dbsqlite.AttendanceModel;
 import com.bhavdip.pupilpresentar.dbsqlite.StudentModel;
-import com.bhavdip.pupilpresentar.fragment.CameraFragment;
+import com.bhavdip.pupilpresentar.fragment.ContactUsFragment;
 import com.bhavdip.pupilpresentar.fragment.NewsFragment;
 import com.bhavdip.pupilpresentar.fragment.StudentFragment;
 import com.bhavdip.pupilpresentar.utility.Constants;
@@ -159,9 +163,8 @@ public class MainActivity extends AppCompatActivity
 
                 break;
             case R.id.nav_barcode_scan:
-//                fragment = new CameraFragment();
+//                fragment = new ContactUsFragment();
                 title = "Attendance";
-
 
 
                 // launch barcode activity.
@@ -176,6 +179,7 @@ public class MainActivity extends AppCompatActivity
 
             case R.id.nav_contact:
                 title = "Contact Us";
+                fragment = new ContactUsFragment();
 
                 viewIsAtHome = false;
                 break;
@@ -187,7 +191,6 @@ public class MainActivity extends AppCompatActivity
                 break;
             case R.id.nav_about:
                 title = "About Us";
-                fragment = new CameraFragment();
 
                 viewIsAtHome = false;
                 break;
@@ -285,13 +288,13 @@ public class MainActivity extends AppCompatActivity
                     StudentModel studentModel = new StudentModel(this);
                     String storedRollNo = studentModel.getSinlgeEntry(barcode.displayValue);
 
-                    if (barcode.displayValue.equals(storedRollNo)){
+                    if (barcode.displayValue.equals(storedRollNo)) {
                         AttendanceModel attendanceModel = new AttendanceModel(this);
                         String date = new SimpleDateFormat("dd-MM-yyyy").format(new Date());
-                        attendanceModel.insertEntry(barcode.displayValue,date,"PRESENT");
-                        Snackbar.make(findViewById(android.R.id.content), "Attendance Presented for "+barcode.displayValue, Snackbar.LENGTH_LONG).show();
+                        attendanceModel.insertEntry(barcode.displayValue, date, "PRESENT");
+                        Snackbar.make(findViewById(android.R.id.content), "Attendance Presented for " + barcode.displayValue, Snackbar.LENGTH_LONG).show();
 
-                    }else{
+                    } else {
                         Snackbar.make(findViewById(android.R.id.content), "No Student Found!", Snackbar.LENGTH_LONG).show();
 
                     }
@@ -306,5 +309,27 @@ public class MainActivity extends AppCompatActivity
         } else {
             super.onActivityResult(requestCode, resultCode, data);
         }
+    }
+
+    public void emailMe(View v) {
+        // does something very interesting
+        String subject = getString(R.string.support_email_subject);
+        String supportAddress = getString(R.string.contact_email);
+        ;
+        Intent intent = new Intent(Intent.ACTION_VIEW);
+        Uri data = Uri.parse("mailto:" + supportAddress + "?subject=" + subject);
+        intent.setData(data);
+        startActivity(intent);
+    }
+
+    public void Call(View v) {
+        // does something very interesting
+        Intent phoneIntent = new Intent(Intent.ACTION_CALL);
+        phoneIntent.setData(Uri.parse("tel:91-903-341-9936"));
+        if (ActivityCompat.checkSelfPermission(this,
+                Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED) {
+            return;
+        }
+        startActivity(phoneIntent);
     }
 }

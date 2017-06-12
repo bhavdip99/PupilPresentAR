@@ -33,4 +33,8 @@
     <string name="prompt_parent_mobile">Parent Mobile</string>
     <string name="prompt_parent_occupation">Parent Occupation</string>
     <string name="action_register">Register</string>
+
+    <string name="support_email_subject">App Feedback</string>
+    <string name="contact_email">bhalodia.bhavdip@gmail.com</string>
+
 </resources>
