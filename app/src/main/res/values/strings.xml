@@ -22,5 +22,15 @@
     <string name="service_not_available">Service Not Available</string>
     <string name="invalid_lat_long_used">Invalid Lat and Long</string>
     <string name="no_address_found">No Address Found</string>
+    <string name="no_location_data_provided">No location data provided</string>
     <string name="address_found">Found</string>
+
+    <!--Add Student-->
+    <string name="prompt_rollno">Roll No</string>
+    <string name="prompt_first_name">First name</string>
+    <string name="prompt_last_name">Last Name</string>
+    <string name="prompt_email">Email</string>
+    <string name="prompt_parent_mobile">Parent Mobile</string>
+    <string name="prompt_parent_occupation">Parent Occupation</string>
+    <string name="action_register">Register</string>
 </resources>

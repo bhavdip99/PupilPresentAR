@@ -26,22 +26,43 @@ import static android.content.ContentValues.TAG;
  */
 
 public class FetchAddressIntentService extends IntentService {
+    private static final String TAG = "FetchAddressIS";
     protected ResultReceiver mReceiver;
 
     public FetchAddressIntentService() {
-        super("Fetch Address Service");
+        // Use the TAG to name the worker thread.
+        super(TAG);
     }
 
     @Override
     protected void onHandleIntent(@Nullable Intent intent) {
-
-        mReceiver = intent.getParcelableExtra(Constants.RECEIVER);
         Geocoder geocoder = new Geocoder(this, Locale.getDefault());
         String errorMessage = "";
 
+        mReceiver = intent.getParcelableExtra(Constants.RECEIVER);
+
+        // Check if receiver was properly registered.
+        if (mReceiver == null) {
+            Log.wtf(TAG, "No receiver received. There is nowhere to send the results.");
+            return;
+        }
+
         // Get the location passed to this service through an extra.
-        Location location = intent.getParcelableExtra(
-                Constants.LOCATION_DATA_EXTRA);
+        Location location = intent.getParcelableExtra(Constants.LOCATION_DATA_EXTRA);
+
+        // Make sure that the location data was really sent over through an extra. If it wasn't,
+        // send an error error message and return.
+        if (location == null) {
+            errorMessage = getString(R.string.no_location_data_provided);
+            Log.wtf(TAG, errorMessage);
+            deliverResultToReceiver(Constants.FAILURE_RESULT, errorMessage);
+            return;
+        }
+
+
+        Geocoder geocoder = new Geocoder(this, Locale.getDefault());
+
+        // Address found using the Geocoder.
         List<Address> addresses = null;
 
         try {

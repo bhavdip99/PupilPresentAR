@@ -5,6 +5,7 @@
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.INTERNET" />
+
     <uses-feature android:name="android.hardware.camera" />
     <uses-permission android:name="android.permission.CAMERA" />
 
@@ -25,7 +26,7 @@
 
         <service
             android:name=".FetchAddressIntentService"
-            android:exported="false"/>
+            android:exported="false" />
 
         <activity
             android:name=".MainActivity"
@@ -38,8 +39,16 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".barcodescanning.BarcodeCaptureActivity"
-            android:label="Read Barcode"/>
+        <activity
+            android:name=".barcodescanning.BarcodeCaptureActivity"
+            android:label="Read Barcode" />
+        <activity
+            android:name=".AddStudentActivity"
+            android:label="Register Student" />
+
+        <meta-data
+            android:name="io.fabric.ApiKey"
+            android:value="fff06c610e805ba64f69dba0b1c47f96114a6d83" />
     </application>
 
 </manifest>
