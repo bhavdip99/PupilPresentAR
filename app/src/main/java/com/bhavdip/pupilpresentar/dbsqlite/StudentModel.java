@@ -4,15 +4,18 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Bitmap;
 
-/**
- * Created by aakash on 05/09/14.
- */
+import com.bhavdip.pupilpresentar.model.Student;
+import com.bhavdip.pupilpresentar.utility.Utility;
+
+import java.util.ArrayList;
+
 public class StudentModel extends Model {
-    private static final String TABLE_STUDENTS = "pp_users";
+    private static final String TABLE_STUDENTS = "pp_student";
 
     //Fields
-    private static final String KEY_USERS_ID = "user_id";
+    private static final String KEY_STUDENT_ID = "student_id";
 
     private static final String KEY_ROLL_NO = "roll_no";
     private static final String KEY_FIRST_NAME = "first_name";
@@ -23,27 +26,17 @@ public class StudentModel extends Model {
     private static final String KEY_GENDER = "gender";
     private static final String KEY_IMAGE = "image";
 
-    private static final String CREATE_TABLE_USERS = "create table if not exists "
-            + TABLE_STUDENTS
-            + " ( "
-            + KEY_USERS_ID
-            + " integer primary key autoincrement, "
-            + KEY_ROLL_NO
-            + " text not null unique,"
-            + KEY_FIRST_NAME
-            + " text,"
-            + KEY_LAST_NAME
-            + " text,"
-            + KEY_EMAIL
-            + " text,"
-            + KEY_PARENT_MOBILE
-            + " text,"
-            + KEY_PARENT_OCCUPATION
-            + " text,"
-            + KEY_GENDER
-            + " text,"
-            + KEY_IMAGE
-            + " BLOB);";
+    private static final String CREATE_TABLE_STUDENT = "create table if not exists "
+            + TABLE_STUDENTS + " ( "
+            + KEY_STUDENT_ID + " integer primary key autoincrement, "
+            + KEY_ROLL_NO + " text not null unique,"
+            + KEY_FIRST_NAME + " text,"
+            + KEY_LAST_NAME + " text,"
+            + KEY_EMAIL + " text,"
+            + KEY_PARENT_MOBILE + " text,"
+            + KEY_PARENT_OCCUPATION + " text,"
+            + KEY_GENDER + " text,"
+            + KEY_IMAGE + " BLOB);";
 
     public StudentModel(Context ctx) {
         super(ctx);
@@ -64,7 +57,7 @@ public class StudentModel extends Model {
      * @param db SQLiteDatabase instance
      */
     public static void createTable(SQLiteDatabase db) {
-        db.execSQL(StudentModel.CREATE_TABLE_USERS);
+        db.execSQL(StudentModel.CREATE_TABLE_STUDENT);
     }
 
     /**
@@ -77,8 +70,10 @@ public class StudentModel extends Model {
     }
 
     public void insertEntry(String strRollno, String gender, String strFirstname, String strLastname, String strEmail,
-                            String strMobile, String strOccupation) {
+                            String strMobile, String strOccupation,Bitmap img) {
 
+
+        byte[] image = Utility.getBitmapAsByteArray(img);
         open();
         ContentValues newValues = new ContentValues();
         // Assign values for each row.
@@ -89,9 +84,71 @@ public class StudentModel extends Model {
         newValues.put(KEY_EMAIL, strEmail);
         newValues.put(KEY_PARENT_MOBILE, strMobile);
         newValues.put(KEY_PARENT_OCCUPATION, strOccupation);
-
+        if (img!=null) {
+            newValues.put(KEY_IMAGE, image);
+        }else{
+            newValues.put(KEY_IMAGE, new byte[0]);
+        }
         // Insert the row into your table
         db.insert(StudentModel.TABLE_STUDENTS, null, newValues);
+    }
+    private Student cursorToStudent(Cursor cursor)
+    {
+        Student student = new Student();
+
+        student.setRollno(cursor.getString(cursor
+                .getColumnIndex(StudentModel.KEY_ROLL_NO)));
+
+        student.setFirstName(cursor.getString(cursor
+                .getColumnIndex(StudentModel.KEY_FIRST_NAME)));
+
+        student.setLastName(cursor.getString(cursor
+                .getColumnIndex(StudentModel.KEY_LAST_NAME)));
+
+        student.setEmail(cursor.getString(cursor
+                .getColumnIndex(StudentModel.KEY_EMAIL)));
+
+        student.setGender(cursor.getString(cursor
+                .getColumnIndex(StudentModel.KEY_GENDER)));
+
+        student.setParent_mobile(cursor.getString(cursor
+                .getColumnIndex(StudentModel.KEY_PARENT_MOBILE)));
+
+        student.setParent_occupation(cursor.getString(cursor
+                .getColumnIndex(StudentModel.KEY_PARENT_OCCUPATION)));
+
+        student.setImage(cursor.getBlob(cursor
+                .getColumnIndex(StudentModel.KEY_IMAGE)));
+
+        return student;
+    }
+
+    public ArrayList<Student> getStudentList()
+    {
+        open();
+        String selectQuery = "SELECT * FROM " + StudentModel.TABLE_STUDENTS;
+
+//        selectQuery = selectQuery + " WHERE " + StudentModel.KEY_ROLL_NO + "=" + rollno;
+//        selectQuery = selectQuery + " AND " + StudentModel.KEY_INCLUDE_IN_MENU + "= 1";
+//        if(parentId>0)
+//        {
+//            selectQuery = selectQuery + " AND " + StudentModel.KEY_PARENT_ID + "=" + parentId;
+//        }
+
+//        selectQuery = selectQuery + " ORDER BY " + StudentModel.KEY_POSITION
+//                + " COLLATE NOCASE ASC";
+        Cursor cursor = db.rawQuery(selectQuery, null);
+        ArrayList<Student> list = new ArrayList<Student>();
+        cursor.moveToFirst();
+        while (!cursor.isAfterLast())
+        {
+            Student student = cursorToStudent(cursor);
+            list.add(student);
+            cursor.moveToNext();
+        }
+        cursor.close();
+        close();
+        return list;
     }
 
     public String getSinlgeEntry(String roll_no) {
@@ -103,9 +160,9 @@ public class StudentModel extends Model {
             return "NOT EXIST";
         }
         cursor.moveToFirst();
-        String email = cursor.getString(cursor.getColumnIndex(StudentModel.KEY_EMAIL));
+        String rollno = cursor.getString(cursor.getColumnIndex(StudentModel.KEY_ROLL_NO));
         cursor.close();
-        return email;
+        return rollno;
     }
 
 }

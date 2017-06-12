@@ -6,7 +6,7 @@ import android.database.sqlite.SQLiteDatabase;
 /**
  * Abstract class for a sample Model related to a table in a SQLite Database.
  *
- * @author Aakash Kejriwal
+ * @author Bhavdip Bhalodia
  */
 public abstract class Model {
 

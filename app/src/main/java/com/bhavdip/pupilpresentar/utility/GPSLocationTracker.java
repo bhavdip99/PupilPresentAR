@@ -1,9 +1,5 @@
 package com.bhavdip.pupilpresentar.utility;
 
-/**
- * Created by bhavdip on 11-06-2017.
- */
-
 import android.Manifest;
 import android.app.AlertDialog;
 import android.app.Service;

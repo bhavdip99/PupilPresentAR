@@ -14,12 +14,10 @@
             android:id="@+id/nav_barcode_scan"
             android:icon="@drawable/ic_menu_camera"
             android:title="Barcode Scan" />
-<!--
         <item
-            android:id="@+id/nav_slideshow"
+            android:id="@+id/nav_news"
             android:icon="@drawable/ic_menu_slideshow"
-            android:title="Upload Image" />
--->
+            android:title="Latest News" />
     </group>
 
     <item android:title="Communicate">

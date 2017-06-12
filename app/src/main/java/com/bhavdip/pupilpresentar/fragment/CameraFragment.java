@@ -8,9 +8,6 @@ import android.view.ViewGroup;
 
 import com.bhavdip.pupilpresentar.R;
 
-/**
- * Created by bhavdip on 11/6/17.
- */
 
 public class CameraFragment extends Fragment {
 

@@ -21,9 +21,6 @@ import java.util.Locale;
 
 import static android.content.ContentValues.TAG;
 
-/**
- * Created by bhavdip on 11-06-2017.
- */
 
 public class FetchAddressIntentService extends IntentService {
     private static final String TAG = "FetchAddressIS";

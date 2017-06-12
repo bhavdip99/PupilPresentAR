@@ -10,9 +10,6 @@ import com.facebook.drawee.backends.pipeline.Fresco;
 
 import io.fabric.sdk.android.Fabric;
 
-/**
- * Created by bhavdip on 30/5/17.
- */
 
 public class AppApplication extends Application {
     private static Context mContext;

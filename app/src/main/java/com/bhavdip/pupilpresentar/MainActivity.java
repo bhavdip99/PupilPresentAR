@@ -22,6 +22,8 @@ import android.view.MenuItem;
 import android.widget.Toast;
 
 import com.bhavdip.pupilpresentar.barcodescanning.BarcodeCaptureActivity;
+import com.bhavdip.pupilpresentar.dbsqlite.AttendanceModel;
+import com.bhavdip.pupilpresentar.dbsqlite.StudentModel;
 import com.bhavdip.pupilpresentar.fragment.CameraFragment;
 import com.bhavdip.pupilpresentar.fragment.NewsFragment;
 import com.bhavdip.pupilpresentar.fragment.StudentFragment;
@@ -29,6 +31,9 @@ import com.bhavdip.pupilpresentar.utility.Constants;
 import com.bhavdip.pupilpresentar.utility.GPSLocationTracker;
 import com.google.android.gms.common.api.CommonStatusCodes;
 import com.google.android.gms.vision.barcode.Barcode;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -108,6 +113,10 @@ public class MainActivity extends AppCompatActivity
         if (id == R.id.action_settings) {
             return true;
         }
+        if (id == android.R.id.home) {
+            this.finish();
+            return true;
+        }
 
         return super.onOptionsItemSelected(item);
     }
@@ -158,7 +167,7 @@ public class MainActivity extends AppCompatActivity
                 // launch barcode activity.
                 Intent intent = new Intent(this, BarcodeCaptureActivity.class);
                 intent.putExtra(BarcodeCaptureActivity.AutoFocus, true);
-                intent.putExtra(BarcodeCaptureActivity.UseFlash, true);
+                intent.putExtra(BarcodeCaptureActivity.UseFlash, false);
 
                 startActivityForResult(intent, RC_BARCODE_CAPTURE);
                 viewIsAtHome = false;
@@ -167,6 +176,11 @@ public class MainActivity extends AppCompatActivity
 
             case R.id.nav_contact:
                 title = "Contact Us";
+
+                viewIsAtHome = false;
+                break;
+            case R.id.nav_news:
+                title = "Latest News";
                 fragment = new NewsFragment();
 
                 viewIsAtHome = false;
@@ -267,6 +281,22 @@ public class MainActivity extends AppCompatActivity
                     Barcode barcode = data.getParcelableExtra(BarcodeCaptureActivity.BarcodeObject);
                     // TODO Save barcode to the database from here
                     Toast.makeText(MainActivity.this, barcode.displayValue, Toast.LENGTH_LONG).show();
+
+                    StudentModel studentModel = new StudentModel(this);
+                    String storedRollNo = studentModel.getSinlgeEntry(barcode.displayValue);
+
+                    if (barcode.displayValue.equals(storedRollNo)){
+                        AttendanceModel attendanceModel = new AttendanceModel(this);
+                        String date = new SimpleDateFormat("dd-MM-yyyy").format(new Date());
+                        attendanceModel.insertEntry(barcode.displayValue,date,"PRESENT");
+                        Snackbar.make(findViewById(android.R.id.content), "Attendance Presented for "+barcode.displayValue, Snackbar.LENGTH_LONG).show();
+
+                    }else{
+                        Snackbar.make(findViewById(android.R.id.content), "No Student Found!", Snackbar.LENGTH_LONG).show();
+
+                    }
+
+
                 } else {
                     Log.d("", "No barcode captured, intent data is null");
                 }

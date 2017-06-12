@@ -1,9 +1,5 @@
 package com.bhavdip.pupilpresentar.utility;
 
-/**
- * Created by bhavdip on 11-06-2017.
- */
-
 public class Constants {
     public static final String RESULT_DATA_KEY = "com.bhavdip.pupilpresentar.RESULT_DATA_KEY";
     public static final String RECEIVER = "com.bhavdip.pupilpresentar.RECEIVER";
