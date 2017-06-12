@@ -3,6 +3,7 @@ package com.bhavdip.pupilpresentar.adapter;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Build;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -42,7 +43,7 @@ public class StudentAdapter extends RecyclerView.Adapter<StudentAdapter.NewsView
     }
 
     @Override
-    public void onBindViewHolder(StudentAdapter.NewsViewHolder holder, final int position) {
+    public void onBindViewHolder(NewsViewHolder holder, final int position) {
         holder.name.setText(students.get(position).getFirstName() +" "+students.get(position).getLastName());
         holder.email.setText(students.get(position).getEmail());
         holder.roll_no.setText(students.get(position).getRollno());
@@ -51,7 +52,11 @@ public class StudentAdapter extends RecyclerView.Adapter<StudentAdapter.NewsView
         if (students.get(position).getImage()!=null) {
             holder.img_News.setImageBitmap(Utility.getByteArrayAsBitmap(students.get(position).getImage()));
         }else{
-            holder.img_News.setImageBitmap(Utility.getByteArrayAsBitmap(new byte[0]));
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                holder.img_News.setImageDrawable(context.getResources().getDrawable(R.drawable.img_profile_pic));
+            }else{
+                holder.img_News.setImageDrawable(context.getResources().getDrawable(R.drawable.img_profile_pic));
+            }
         }
     }
 

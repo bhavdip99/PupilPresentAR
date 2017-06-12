@@ -70,10 +70,10 @@ public class StudentModel extends Model {
     }
 
     public void insertEntry(String strRollno, String gender, String strFirstname, String strLastname, String strEmail,
-                            String strMobile, String strOccupation,Bitmap img) {
+                            String strMobile, String strOccupation, byte[] img) {
 
 
-        byte[] image = Utility.getBitmapAsByteArray(img);
+
         open();
         ContentValues newValues = new ContentValues();
         // Assign values for each row.
@@ -84,11 +84,8 @@ public class StudentModel extends Model {
         newValues.put(KEY_EMAIL, strEmail);
         newValues.put(KEY_PARENT_MOBILE, strMobile);
         newValues.put(KEY_PARENT_OCCUPATION, strOccupation);
-        if (img!=null) {
-            newValues.put(KEY_IMAGE, image);
-        }else{
-            newValues.put(KEY_IMAGE, new byte[0]);
-        }
+        newValues.put(KEY_IMAGE, img);
+
         // Insert the row into your table
         db.insert(StudentModel.TABLE_STUDENTS, null, newValues);
     }

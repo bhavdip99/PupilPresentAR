@@ -15,6 +15,8 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.Gravity;
 import android.view.View;
 import android.view.Window;
@@ -25,8 +27,10 @@ import android.widget.ImageView;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bhavdip.pupilpresentar.dbsqlite.StudentModel;
+import com.bhavdip.pupilpresentar.utility.Utility;
 
 public class AddStudentActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -69,6 +73,30 @@ public class AddStudentActivity extends AppCompatActivity implements View.OnClic
         imageViewProfilePic = (ImageView) findViewById(R.id.imgViw_profile_pic);
         imageViewProfilePic.setOnClickListener(this);
 
+        email.addTextChangedListener(new TextWatcher() {
+            public void afterTextChanged(Editable s) {
+                String emailPattern = "[a-zA-Z0-9._-]+@[a-z]+\\.+[a-z]+";
+                if (email.getText().toString().matches(emailPattern) && s.length() > 0)
+                {
+                    Toast.makeText(getApplicationContext(),"valid email address",Toast.LENGTH_SHORT).show();
+                    // or
+//                    email.setError("valid email");
+                }
+                else
+                {
+                    Toast.makeText(getApplicationContext(),"Invalid email address",Toast.LENGTH_SHORT).show();
+                    //or
+                    email.setError("invalid email");
+                }
+            }
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                // other stuffs
+            }
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                // other stuffs
+            }
+        });
+
         btnRegister .setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -89,6 +117,14 @@ public class AddStudentActivity extends AppCompatActivity implements View.OnClic
                     Snackbar.make(findViewById(android.R.id.content), "Field should not Empty", Snackbar.LENGTH_LONG).show();
                     return;
                 }
+                if (!Utility.isValidEmail(strEmail)){
+                    Snackbar.make(findViewById(android.R.id.content), "Please enter valid email id.", Snackbar.LENGTH_LONG).show();
+                    return;
+                }
+                if (thePic==null){
+                    Snackbar.make(findViewById(android.R.id.content), "Please capture your picture.", Snackbar.LENGTH_LONG).show();
+                    return;
+                }
                 // check if both password matches
                 if (strMobile.length() != 10) {
                     Snackbar.make(findViewById(android.R.id.content), "enter correct mobile no", Snackbar.LENGTH_LONG).show();
@@ -97,7 +133,11 @@ public class AddStudentActivity extends AppCompatActivity implements View.OnClic
 
                     // Save the Data in Database
                     StudentModel studentModel = new StudentModel(AddStudentActivity.this);
-                    studentModel.insertEntry(strRollno,gender,strFirstname,strLastname, strEmail, strMobile, strOccupation,thePic);
+                    byte[] image = new byte[0];
+                    if (thePic!=null){
+                        image = Utility.getBitmapAsByteArray(thePic);
+                    }
+                    studentModel.insertEntry(strRollno,gender,strFirstname,strLastname, strEmail, strMobile, strOccupation,image);
                     Snackbar.make(findViewById(android.R.id.content), "Account Successfully Created ", Snackbar.LENGTH_LONG).show();
 
                     Intent intent = new Intent(AddStudentActivity.this, MainActivity.class);
@@ -106,7 +146,6 @@ public class AddStudentActivity extends AppCompatActivity implements View.OnClic
                 }
             }
         });
-
     }
 
     @Override

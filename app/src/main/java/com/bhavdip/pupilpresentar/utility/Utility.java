@@ -22,4 +22,13 @@ public class Utility {
         return BitmapFactory.decodeByteArray(image, 0, image.length);
     }
 
+    public static boolean isValidEmail(String email) {
+        if (email == null) {
+            return false;
+        } else {
+
+            return android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches();
+        }
+    }
+
 }
