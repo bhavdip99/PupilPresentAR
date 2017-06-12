@@ -28,12 +28,14 @@ import static android.content.ContentValues.TAG;
 public class FetchAddressIntentService extends IntentService {
     protected ResultReceiver mReceiver;
 
-    public FetchAddressIntentService(String name) {
-        super(name);
+    public FetchAddressIntentService() {
+        super("Fetch Address Service");
     }
 
     @Override
     protected void onHandleIntent(@Nullable Intent intent) {
+
+        mReceiver = intent.getParcelableExtra(Constants.RECEIVER);
         Geocoder geocoder = new Geocoder(this, Locale.getDefault());
         String errorMessage = "";
 
