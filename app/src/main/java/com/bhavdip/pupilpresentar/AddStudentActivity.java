@@ -14,10 +14,13 @@ import android.provider.MediaStore;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.Gravity;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -53,11 +56,14 @@ public class AddStudentActivity extends AppCompatActivity implements View.OnClic
     private Uri picUri;
     private Bitmap thePic;
 
+    private ActionBar actionBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_student);
+        actionBar = getSupportActionBar();
+        actionBar.setDisplayHomeAsUpEnabled(true);
 
 
         // Get Refferences of Views
@@ -137,15 +143,45 @@ public class AddStudentActivity extends AppCompatActivity implements View.OnClic
                     if (thePic!=null){
                         image = Utility.getBitmapAsByteArray(thePic);
                     }
-                    studentModel.insertEntry(strRollno,gender,strFirstname,strLastname, strEmail, strMobile, strOccupation,image);
-                    Snackbar.make(findViewById(android.R.id.content), "Account Successfully Created ", Snackbar.LENGTH_LONG).show();
+                    boolean inserted = studentModel.insertEntry(strRollno,gender,strFirstname,strLastname, strEmail, strMobile, strOccupation,image);
+                    if (inserted) {
+                        Snackbar.make(findViewById(android.R.id.content), "Account Successfully Created ", Snackbar.LENGTH_LONG).show();
 
-                    Intent intent = new Intent(AddStudentActivity.this, MainActivity.class);
-                    intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                    startActivity(intent);
+                        Intent intent = new Intent(AddStudentActivity.this, MainActivity.class);
+                        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                        startActivity(intent);
+                    }else{
+                        Snackbar.make(findViewById(android.R.id.content), "Something went Wrong!", Snackbar.LENGTH_LONG).show();
+                    }
                 }
             }
         });
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.main, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+
+        //noinspection SimplifiableIfStatement
+        if (id == R.id.action_settings) {
+            return true;
+        }
+        if (id == android.R.id.home) {
+            this.finish();
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
@@ -173,6 +209,12 @@ public class AddStudentActivity extends AppCompatActivity implements View.OnClic
         btnCamera.setText("Camera");
         TextView btnRemovePhoto = (TextView) dialog.findViewById(R.id.btn_remove_photo);
         btnRemovePhoto.setText("Remove photo");
+
+        if (picUri==null){
+            btnRemovePhoto.setEnabled(false);
+        }else{
+            btnRemovePhoto.setEnabled(true);
+        }
 
         btnRemovePhoto.setOnClickListener(new View.OnClickListener() {
             @Override

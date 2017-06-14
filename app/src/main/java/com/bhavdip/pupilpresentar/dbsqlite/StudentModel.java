@@ -69,7 +69,7 @@ public class StudentModel extends Model {
         db.execSQL("DELETE FROM " + StudentModel.TABLE_STUDENTS);
     }
 
-    public void insertEntry(String strRollno, String gender, String strFirstname, String strLastname, String strEmail,
+    public boolean insertEntry(String strRollno, String gender, String strFirstname, String strLastname, String strEmail,
                             String strMobile, String strOccupation, byte[] img) {
 
 
@@ -87,7 +87,12 @@ public class StudentModel extends Model {
         newValues.put(KEY_IMAGE, img);
 
         // Insert the row into your table
-        db.insert(StudentModel.TABLE_STUDENTS, null, newValues);
+        long rowInserted = db.insert(StudentModel.TABLE_STUDENTS, null, newValues);
+        if(rowInserted != -1){
+            return true;
+        }else{
+            return false;
+        }
     }
     private Student cursorToStudent(Cursor cursor)
     {

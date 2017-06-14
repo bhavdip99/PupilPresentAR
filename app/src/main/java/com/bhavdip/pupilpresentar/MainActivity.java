@@ -1,6 +1,8 @@
 package com.bhavdip.pupilpresentar;
 
 import android.Manifest;
+import android.app.NotificationManager;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
@@ -12,6 +14,7 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.app.NotificationCompat;
 import android.support.v4.os.ResultReceiver;
 import android.util.Log;
 import android.view.View;
@@ -46,6 +49,7 @@ public class MainActivity extends AppCompatActivity
     private GPSLocationTracker gpsTracker;
     private static final int RC_BARCODE_CAPTURE = 9001;
     private AddressResultReceiver mResultReceiver;
+    public static final int NOTIFICATIONID = 143;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -294,6 +298,7 @@ public class MainActivity extends AppCompatActivity
                         attendanceModel.insertEntry(barcode.displayValue, date, "PRESENT");
                         Snackbar.make(findViewById(android.R.id.content), "Attendance Presented for " + barcode.displayValue, Snackbar.LENGTH_LONG).show();
 
+                        showNotification(barcode.displayValue);
                     } else {
                         Snackbar.make(findViewById(android.R.id.content), "No Student Found!", Snackbar.LENGTH_LONG).show();
 
@@ -309,6 +314,20 @@ public class MainActivity extends AppCompatActivity
         } else {
             super.onActivityResult(requestCode, resultCode, data);
         }
+    }
+
+    private void showNotification(String displayValue) {
+
+
+        NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this);
+        mBuilder.setSmallIcon(R.mipmap.ic_launcher);
+        mBuilder.setContentTitle("Present Student Alert!");
+        mBuilder.setContentText("Hi, This "+displayValue+" is Present in TechRefresh!");
+        NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+
+// notificationID allows you to update the notification later on.
+
+        mNotificationManager.notify(NOTIFICATIONID, mBuilder.build());
     }
 
     public void emailMe(View v) {
