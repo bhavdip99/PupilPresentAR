@@ -10,6 +10,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 
+import com.bhavdip.pupilpresentar.activity.LoginActivity;
+
 /**
  * Created by bhavdip on 14/6/17.
  */
@@ -22,9 +24,6 @@ public class SplashScreenActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash);
 
-
-
-
         Log.v("tag","onCreate");
 
 
@@ -35,8 +34,8 @@ public class SplashScreenActivity extends AppCompatActivity {
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 } finally {
-                    Intent intent = new Intent(SplashScreenActivity.this, HomeActivity.class);
-//                    startActivity(intent);
+                    Intent intent = new Intent(SplashScreenActivity.this, LoginActivity.class);
+                    startActivity(intent);
                 }
             }
         };

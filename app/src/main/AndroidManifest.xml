@@ -46,7 +46,10 @@
             android:label="Read Barcode" />
         <activity
             android:name=".MainActivity"
-            android:label="Read Barcode" />
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".activity.LoginActivity"
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".HomeActivity"
             android:label="Read Barcode" />
