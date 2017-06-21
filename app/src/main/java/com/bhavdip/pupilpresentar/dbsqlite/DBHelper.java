@@ -4,8 +4,6 @@ import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
-import com.bhavdip.pupilpresentar.model.Attendance;
-
 
 /**
  * Class that handles a Singleton DB connection.
@@ -59,6 +57,7 @@ public class DBHelper extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase db) {
         StudentModel.createTable(db);
         AttendanceModel.createTable(db);
+        UsersModel.createTable(db);
         //User extra any no of table here - by Bhavdip
     }
 
@@ -70,6 +69,7 @@ public class DBHelper extends SQLiteOpenHelper {
         //Drop User Table if exist
         StudentModel.dropTable(db);
         AttendanceModel.dropTable(db);
+        UsersModel.dropTable(db);
         // Create tables again
         onCreate(db);
     }

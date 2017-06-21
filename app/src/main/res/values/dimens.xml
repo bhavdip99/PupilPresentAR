@@ -11,5 +11,9 @@
 
 
     <dimen name="futura_book_32">16sp</dimen>
+    <dimen name="futura_book_40">20sp</dimen>
+    <dimen name="futura_book_50">25sp</dimen>
+
+    <dimen name="user_cell_btw_padding">7dp</dimen>
 
 </resources>

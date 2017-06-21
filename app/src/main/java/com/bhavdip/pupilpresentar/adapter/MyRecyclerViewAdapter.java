@@ -1,4 +1,4 @@
-package com.bhavdip.pupilpresentar;
+package com.bhavdip.pupilpresentar.adapter;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
@@ -6,6 +6,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+
+import com.bhavdip.pupilpresentar.R;
 
 /**
  * Created by bhavdip on 14/6/17.

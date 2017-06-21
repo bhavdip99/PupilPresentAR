@@ -10,30 +10,33 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.os.ResultReceiver;
-import android.util.Log;
-import android.view.View;
-import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bhavdip.pupilpresentar.activity.BaseActivity;
+import com.bhavdip.pupilpresentar.activity.LoginActivity;
 import com.bhavdip.pupilpresentar.barcodescanning.BarcodeCaptureActivity;
 import com.bhavdip.pupilpresentar.dbsqlite.AttendanceModel;
 import com.bhavdip.pupilpresentar.dbsqlite.StudentModel;
 import com.bhavdip.pupilpresentar.fragment.ContactUsFragment;
+import com.bhavdip.pupilpresentar.fragment.HomeFragment;
 import com.bhavdip.pupilpresentar.fragment.NewsFragment;
-import com.bhavdip.pupilpresentar.fragment.StudentFragment;
+import com.bhavdip.pupilpresentar.model.User;
 import com.bhavdip.pupilpresentar.utility.Constants;
 import com.bhavdip.pupilpresentar.utility.GPSLocationTracker;
 import com.google.android.gms.common.api.CommonStatusCodes;
@@ -42,14 +45,17 @@ import com.google.android.gms.vision.barcode.Barcode;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-public class MainActivity extends AppCompatActivity
+public class MainActivity extends BaseActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
-    private boolean viewIsAtHome;
-    private GPSLocationTracker gpsTracker;
-    private static final int RC_BARCODE_CAPTURE = 9001;
-    private AddressResultReceiver mResultReceiver;
+    public static final String USER = "com.bhavdip.pupilpresentar.MainActivity.user";
+
     public static final int NOTIFICATIONID = 143;
+    private static final int RC_BARCODE_CAPTURE = 9001;
+    public static boolean viewIsAtHome;
+    private GPSLocationTracker gpsTracker;
+    private AddressResultReceiver mResultReceiver;
+    private User user;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,14 +70,17 @@ public class MainActivity extends AppCompatActivity
         drawer.setDrawerListener(toggle);
         toggle.syncState();
 
+        Bundle b = this.getIntent().getExtras();
+        if (b != null)
+            user = b.getParcelable(USER);
+
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
                 Intent intent = new Intent(MainActivity.this, AddStudentActivity.class);
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+
                 startActivity(intent);
 
             }
@@ -80,6 +89,12 @@ public class MainActivity extends AppCompatActivity
         mResultReceiver = new AddressResultReceiver(null);
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+        View hView =  navigationView.getHeaderView(0);
+        TextView nav_user = (TextView)hView.findViewById(R.id.txt_profilename);
+        TextView nav_email = (TextView)hView.findViewById(R.id.txt_email);
+        nav_user.setText(user.getFullName());
+        nav_email.setText(user.getEmail());
+
         displayView(R.id.nav_manage);
     }
 
@@ -97,9 +112,9 @@ public class MainActivity extends AppCompatActivity
             drawer.closeDrawer(GravityCompat.START);
         }
         if (!viewIsAtHome) { //if the current view is not the News fragment
-            displayView(R.id.nav_manage); //display the News fragment
+            displayView(R.id.nav_manage); //display the Home fragment
         } else {
-            moveTaskToBack(true);  //If view is in News fragment, exit application
+            moveTaskToBack(true);  //If view is in Home fragment, exit application
         }
     }
 
@@ -129,6 +144,11 @@ public class MainActivity extends AppCompatActivity
         return super.onOptionsItemSelected(item);
     }
 
+    @Override
+    protected void showSnackbar(String paramString) {
+        super.showSnackbar(paramString);
+    }
+
     public void displayView(int viewId) {
 
         Fragment fragment = null;
@@ -137,14 +157,16 @@ public class MainActivity extends AppCompatActivity
         switch (viewId) {
 
             case R.id.nav_manage:
-                fragment = new StudentFragment();
-//                title = "News";
+                fragment = new HomeFragment();
                 viewIsAtHome = true;
+
 
                 break;
             case R.id.nav_location:
                 title = "Show Location";
 
+
+//                fragment = new LocationFragment();
                 // create class object
                 gpsTracker = new GPSLocationTracker(MainActivity.this);
 
@@ -166,20 +188,6 @@ public class MainActivity extends AppCompatActivity
                 viewIsAtHome = false;
 
                 break;
-            case R.id.nav_barcode_scan:
-//                fragment = new ContactUsFragment();
-                title = "Attendance";
-
-
-                // launch barcode activity.
-                Intent intent = new Intent(this, BarcodeCaptureActivity.class);
-                intent.putExtra(BarcodeCaptureActivity.AutoFocus, true);
-                intent.putExtra(BarcodeCaptureActivity.UseFlash, false);
-
-                startActivityForResult(intent, RC_BARCODE_CAPTURE);
-                viewIsAtHome = false;
-
-                break;
 
             case R.id.nav_contact:
                 title = "Contact Us";
@@ -195,6 +203,14 @@ public class MainActivity extends AppCompatActivity
                 break;
             case R.id.nav_about:
                 title = "About Us";
+
+                viewIsAtHome = false;
+                break;
+            case R.id.nav_signout:
+                Intent loginscreen = new Intent(this, LoginActivity.class);
+                loginscreen.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                startActivity(loginscreen);
+                this.finish();
 
                 viewIsAtHome = false;
                 break;
@@ -235,29 +251,6 @@ public class MainActivity extends AppCompatActivity
         startService(intent);
     }
 
-
-    class AddressResultReceiver extends ResultReceiver {
-        public AddressResultReceiver(Handler handler) {
-            super(handler);
-        }
-
-        @Override
-        protected void onReceiveResult(int resultCode, Bundle resultData) {
-
-            // Display the address string
-            // or an error message sent from the intent service.
-            String mAddressOutput = resultData.getString(Constants.RESULT_DATA_KEY);
-            // Show a toast message if an address was found.
-            if (resultCode == Constants.SUCCESS_RESULT) {
-                // \n is for new line
-
-                // TODO Save address to the database from here
-                Log.d("", "Your Location is " + mAddressOutput);
-            }
-
-        }
-    }
-
     /**
      * Called when an activity you launched exits, giving you the requestCode
      * you started it with, the resultCode it returned, and any additional
@@ -282,6 +275,8 @@ public class MainActivity extends AppCompatActivity
      */
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
         if (requestCode == RC_BARCODE_CAPTURE) {
             if (resultCode == CommonStatusCodes.SUCCESS) {
                 if (data != null) {
@@ -322,7 +317,7 @@ public class MainActivity extends AppCompatActivity
         NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this);
         mBuilder.setSmallIcon(R.mipmap.ic_launcher);
         mBuilder.setContentTitle("Present Student Alert!");
-        mBuilder.setContentText("Hi, This "+displayValue+" is Present in TechRefresh!");
+        mBuilder.setContentText("Hi, This " + displayValue + " is Present in TechRefresh!");
         NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
 // notificationID allows you to update the notification later on.
@@ -350,5 +345,27 @@ public class MainActivity extends AppCompatActivity
             return;
         }
         startActivity(phoneIntent);
+    }
+
+    class AddressResultReceiver extends ResultReceiver {
+        public AddressResultReceiver(Handler handler) {
+            super(handler);
+        }
+
+        @Override
+        protected void onReceiveResult(int resultCode, Bundle resultData) {
+
+            // Display the address string
+            // or an error message sent from the intent service.
+            String mAddressOutput = resultData.getString(Constants.RESULT_DATA_KEY);
+            // Show a toast message if an address was found.
+            if (resultCode == Constants.SUCCESS_RESULT) {
+                // \n is for new line
+
+                // TODO Save address to the database from here
+                Log.d("", "Your Location is " + mAddressOutput);
+            }
+
+        }
     }
 }

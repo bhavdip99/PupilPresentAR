@@ -3,16 +3,17 @@ package com.bhavdip.pupilpresentar;
 
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 import android.view.View;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
+import com.bhavdip.pupilpresentar.activity.BaseActivity;
 
-public class WebViewActivity extends AppCompatActivity {
 
-    public static final String URL = "com.bhavdip.haqdarshak.WebViewActivity.URL";
+public class WebViewActivity extends BaseActivity {
+
+    public static final String URL = "com.bhavdip.pupilpresentar.WebViewActivity.URL";
     String trackUrl;
     ActionBar actionBar;
 
@@ -32,14 +33,11 @@ public class WebViewActivity extends AppCompatActivity {
 //        wv.getSettings().setLoadWithOverviewMode(true);
 //        wv.getSettings().setUseWideViewPort(true);
 
-
 //        wv.getSettings().setDisplayZoomControls(false);
         wv.getSettings().setLoadsImagesAutomatically(true);
         wv.getSettings().setJavaScriptEnabled(true);
         wv.setScrollBarStyle(View.SCROLLBARS_INSIDE_OVERLAY);
         wv.loadUrl(trackUrl);
-
-
     }
 
     @Override
@@ -70,6 +68,5 @@ public class WebViewActivity extends AppCompatActivity {
             view.loadUrl(url);
             return true;
         }
-
     }
 }

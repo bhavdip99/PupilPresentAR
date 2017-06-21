@@ -11,13 +11,9 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -30,12 +26,14 @@ import android.widget.ImageView;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
-import android.widget.Toast;
 
+import com.bhavdip.pupilpresentar.activity.BaseActivity;
 import com.bhavdip.pupilpresentar.dbsqlite.StudentModel;
 import com.bhavdip.pupilpresentar.utility.Utility;
 
-public class AddStudentActivity extends AppCompatActivity implements View.OnClickListener {
+import java.io.IOException;
+
+public class AddStudentActivity extends BaseActivity implements View.OnClickListener {
 
     public static final int REQUEST_CROP = 127;
     public static final int REQUEST_CAMERA = 128;
@@ -79,29 +77,23 @@ public class AddStudentActivity extends AppCompatActivity implements View.OnClic
         imageViewProfilePic = (ImageView) findViewById(R.id.imgViw_profile_pic);
         imageViewProfilePic.setOnClickListener(this);
 
-        email.addTextChangedListener(new TextWatcher() {
-            public void afterTextChanged(Editable s) {
-                String emailPattern = "[a-zA-Z0-9._-]+@[a-z]+\\.+[a-z]+";
-                if (email.getText().toString().matches(emailPattern) && s.length() > 0)
-                {
-                    Toast.makeText(getApplicationContext(),"valid email address",Toast.LENGTH_SHORT).show();
-                    // or
+        email.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if (!hasFocus) {
+                    if (Utility.isValidEmail(email.getText().toString()) && email.getText().toString().length() > 0) {
+                        showSnackbar("valid email address");
+                        // or
 //                    email.setError("valid email");
+                    } else {
+                        showSnackbar("Invalid email address");
+                        //or
+                        email.setError("invalid email");
+                    }
                 }
-                else
-                {
-                    Toast.makeText(getApplicationContext(),"Invalid email address",Toast.LENGTH_SHORT).show();
-                    //or
-                    email.setError("invalid email");
-                }
-            }
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-                // other stuffs
-            }
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                // other stuffs
             }
         });
+
 
         btnRegister .setOnClickListener(new View.OnClickListener() {
             @Override
@@ -120,38 +112,46 @@ public class AddStudentActivity extends AppCompatActivity implements View.OnClic
 
                 // check if any of the fields are vaccant
                 if (strFirstname.equals("") || strLastname.equals("") || strEmail.equals("") || strMobile.equals("")) {
-                    Snackbar.make(findViewById(android.R.id.content), "Field should not Empty", Snackbar.LENGTH_LONG).show();
+                    showSnackbar("Field should not Empty");
                     return;
                 }
                 if (!Utility.isValidEmail(strEmail)){
-                    Snackbar.make(findViewById(android.R.id.content), "Please enter valid email id.", Snackbar.LENGTH_LONG).show();
+                    showSnackbar("Please enter valid email id.");
                     return;
                 }
-                if (thePic==null){
-                    Snackbar.make(findViewById(android.R.id.content), "Please capture your picture.", Snackbar.LENGTH_LONG).show();
+                if (thePic==null && picUri==null){
+                    showSnackbar("Please capture your picture.");
                     return;
                 }
                 // check if both password matches
                 if (strMobile.length() != 10) {
-                    Snackbar.make(findViewById(android.R.id.content), "enter correct mobile no", Snackbar.LENGTH_LONG).show();
+                    showSnackbar("Enter correct mobile no.");
                     return;
                 } else {
 
                     // Save the Data in Database
                     StudentModel studentModel = new StudentModel(AddStudentActivity.this);
                     byte[] image = new byte[0];
+                    if (picUri!=null){
+                        try {
+                            thePic = MediaStore.Images.Media.getBitmap(getContentResolver(),picUri);
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
                     if (thePic!=null){
                         image = Utility.getBitmapAsByteArray(thePic);
                     }
                     boolean inserted = studentModel.insertEntry(strRollno,gender,strFirstname,strLastname, strEmail, strMobile, strOccupation,image);
                     if (inserted) {
-                        Snackbar.make(findViewById(android.R.id.content), "Account Successfully Created ", Snackbar.LENGTH_LONG).show();
+                        showSnackbar("Account Successfully Created.");
+
 
                         Intent intent = new Intent(AddStudentActivity.this, MainActivity.class);
                         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                         startActivity(intent);
                     }else{
-                        Snackbar.make(findViewById(android.R.id.content), "Something went Wrong!", Snackbar.LENGTH_LONG).show();
+                        showSnackbar("Something went Wrong!");
                     }
                 }
             }
@@ -273,7 +273,7 @@ public class AddStudentActivity extends AppCompatActivity implements View.OnClic
             @Override
             public void onClick(View v) {
 
-                Snackbar.make(findViewById(android.R.id.content), "Oopps! This functionality coming Soon :)", Snackbar.LENGTH_LONG).show();
+                showSnackbar("Oopps! This functionality coming Soon :)");
 
                 if (dialog != null)
                     dialog.dismiss();
@@ -284,6 +284,32 @@ public class AddStudentActivity extends AppCompatActivity implements View.OnClic
 
     }
 
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        switch (requestCode) {
+            case MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE:
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+
+//                    Intent intent = buildGalleryIntent(mCropParams);
+//                    startActivityForResult(intent, REQUEST_CROP);
+                } else {
+                    showSnackbar("The app was not allowed to write to your storage. " +
+                            "Hence, it cannot function properly. Please consider granting it this permission");
+                }
+                return;
+            case MY_PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE:
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+
+                    launchCamera();
+                } else {
+                    showSnackbar("The app was not allowed to write to your storage. " +
+                            "Hence, it cannot function properly. Please consider granting it this permission");
+                }
+                return;
+        }
+    }
 
     public Uri getImageUri(Context inContext, Bitmap inImage) {
 //        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
@@ -307,18 +333,30 @@ public class AddStudentActivity extends AppCompatActivity implements View.OnClic
                     performCrop();
 
                 } else {
-                    Snackbar.make(findViewById(android.R.id.content), "Returned data is null", Snackbar.LENGTH_LONG).show();
+                    showSnackbar("Returned data is null");
                 }
             }
             // user is returning from cropping the image
             else if (requestCode == REQUEST_CROP) {
                 // get the returned data
-                Bundle extras = data.getExtras();
-                // get the cropped bitmap
-                thePic = extras.getParcelable("data");
-//                ImageView picView = (ImageView) findViewById(R.id.picture);
+                if (data != null) {
+                    if (data.getData() != null) {
 
-                imageViewProfilePic.setImageBitmap(thePic);
+                        picUri = data.getData();
+                        imageViewProfilePic.setImageURI(picUri);
+                    } else if (data.getExtras() != null) {
+
+                        Bundle extras = data.getExtras();
+                        // get the cropped bitmap
+                        thePic = extras.getParcelable("data");
+                        imageViewProfilePic.setImageBitmap(thePic);
+                    }
+                } else {
+                    showSnackbar("Returned data is null");
+                }
+
+
+
             }
         }
     }
@@ -349,7 +387,7 @@ public class AddStudentActivity extends AppCompatActivity implements View.OnClic
         }
         // respond to users whose devices do not support the crop action
         catch (ActivityNotFoundException anfe) {
-            Snackbar.make(findViewById(android.R.id.content), "This device doesn't support the crop action!", Snackbar.LENGTH_LONG).show();
+            showSnackbar("This device doesn't support the crop action!");
         }
     }
 
@@ -366,7 +404,7 @@ public class AddStudentActivity extends AppCompatActivity implements View.OnClic
             //display an error message
             String errorMessage = "Whoops - your device doesn't support capturing images!";
 
-            Snackbar.make(findViewById(android.R.id.content), errorMessage, Snackbar.LENGTH_LONG).show();
+            showSnackbar(errorMessage);
         }
     }
 }

@@ -40,5 +40,9 @@
     <string name="no_network_available">No internet connection.</string>
     <string name="error_empty_username">Please enter username.</string>
     <string name="error_empty_password">Please enter password.</string>
+    <string name="add_profile_photo">Add Profile Photo</string>
+    <string name="cancel_caps">CANCEL</string>
+
+
 
 </resources>

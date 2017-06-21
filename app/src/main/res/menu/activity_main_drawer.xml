@@ -11,10 +11,6 @@
             android:icon="@drawable/ic_menu_send"
             android:title="Get My Location" />
         <item
-            android:id="@+id/nav_barcode_scan"
-            android:icon="@drawable/ic_menu_camera"
-            android:title="Barcode Scan" />
-        <item
             android:id="@+id/nav_news"
             android:icon="@drawable/ic_menu_slideshow"
             android:title="Latest News" />
@@ -30,6 +26,10 @@
                 android:id="@+id/nav_about"
                 android:icon="@drawable/ic_menu_send"
                 android:title="About Us" />
+            <item
+                android:id="@+id/nav_signout"
+                android:icon="@drawable/ic_menu_signout"
+                android:title="Sign out" />
         </menu>
     </item>
 
